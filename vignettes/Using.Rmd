@@ -109,4 +109,55 @@ But what about knitr, which does not recognize the contents of Rcode
 as an R code chunk that should be processed?  That's where this
 package comes in.
 
+# Using the package
+
+
+
+
+# Configuring an ess polymode
+
+If you are using emacs, and especially ess, you want to preserve the
+ability to switch major modes from LaTeX to R and back again depending
+on where you are typing in your document.  ESS has deprecated the
+noweb mode in favor of polymode.  This section explains what you need
+to do for that.
+
+1.  Ensure the following packages are installed and configured in your
+    emacs installation:  ess, polymode, poly-R.
+
+2.  Install poly-latex-R package by coping poly-latex-R.el to your
+    emacs packages directory.  poly-latex-R.el is available with this
+    R package, either from the inst/emacs directory in the source code,
+    or from the \$R\_HOME/library/RlatexUtils/emacs directory in the
+    installed package on your system. Install that file using the M-x
+    package-install-file function from emacs.
+
+3.  Add the following to your emacs preferences file (probably
+    ~/.emacs).  If you are using Aquamacs on MacOS, edit
+    ~/Library/Preferences/Aquamacs Emacs/Preferences.el.
+
+```
+(require 'ess-site)
+(load "ess-autoloads")  ;; need to register Rnw files
+
+(require 'poly-R)
+(require 'poly-markdown)
+(require 'poly-latex-R)
+
+;; recognize Rnw files as poly-latex+R
+(add-to-list 'auto-mode-alist '("\\.[rR]nw$" . poly-latex+R-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR][Ll]atex$" . poly-latex+R-mode))
+;; this means that "classic" noweb Rnw files will not be automatically opened
+;; in poly-noweb+R mode. In that case, set the mode locally.
+;;   manual:  M-x poly-noweb+R-mode
+;;   file variable:    %% -*- mode: poly-noweb+R -*-
+;; Can do the same thing to set the new poly-latex+R mode, if needed.
+
+
+(add-to-list 'LaTeX-verbatim-environments "Rcode")
+(add-to-list 'TeX-file-extensions "RLatex")
+(add-to-list 'TeX-file-extensions "rlatex")
+```
+
+
 
