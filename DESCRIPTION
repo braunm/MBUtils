@@ -1,0 +1,15 @@
+Package: RlatexUtils
+Title: Utilities for Compiling LaTeX with knitr.
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Michael",
+           family = "Braun",
+           role = c("aut", "cre"),
+           email = "braunm@smu.edu",
+           comment = c(ORCID = "0000-0003-4774-2119"))
+Description: Defines a  pattern so knitr can recognize R code chunks defined in an Rcode LaTeX environment.  This pattern is a replacement for the Sweave style of <<>>= and @. Defining Rcode in this way is useful when writing in emacs, because the preview-latex package can then be configured to ignore code chunks entirely.
+Depends: R (>= 3.6.1), knitr (>= 1.24)
+License: LGPL
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1

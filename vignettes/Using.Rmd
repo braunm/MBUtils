@@ -1,0 +1,112 @@
+---
+title: "Using RlatexUtils"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(RlatexUtils)
+```
+
+RlatexUtils is a specialized package to solve a specific problem.
+When editing an Rnw file in emacs, one might want to use the
+preview-latex emacs package for inline previews of typeset math. The
+preview-latex commands often mistake elements of R code for LaTeX math
+expressions.  The most common problem I have found is mistaking a \$
+in an R list element name for the \$\dots\$ that define LaTeX math.
+
+It is possible to configure preview-latex, in the document preamble,
+to ignore expressions contained in certain LaTeX expressions.  But we
+cannot tell preview-latex to ignore text between a <<>>= and a
+\@. This package tells knitr to recognize the code chunk defined in
+the environment.
+
+To put it another way:  Currently, knitr recognizes code chunks
+defined by <<>>= and \@, but preview-latex will try to typeset them,
+and fail. We tell knitr to recognize code in an Rcode environment,
+which we also tell preview-latex to ignore.
+
+# An example of the problem.
+
+Consider the following Rnw file for LaTeX output.
+
+```
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+
+Some code:
+<<>>=
+A <- list(x=1, y=2)
+A$x
+@
+
+Now some math:
+
+\begin{align*}
+ 1+1&=2\\
+ \alpha+\beta&=5
+\end{align*}
+
+Closing text.
+
+\end{document}
+```
+
+This file can be processed by knitr with no problem, but preview-latex
+will mistake the \$ in `A\$x` as the start of a LaTeX math
+expression.  Since we do not want code chunks to be typeset, we will
+instead load latex-preview explicitly, define the Rcode environment
+and Sexpr functions, and tell preview-latex to ignore both of them.
+
+```
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage[textmath,displaymath,showlabels]{preview}
+\newenvironment{Rcode}[1][]{\begin{nopreview}}{\end{nopreview}}
+\newcommand{\Sexpr}[1]{}
+
+\PreviewEnvironment{align*}
+\PreviewMacro*[{{}}]{\Sexpr}
+
+\begin{document}
+
+Some code:
+\begin{Rcode}[]
+A <- list(x=1, y=2)
+A$x
+\end{Rcode}
+
+Now some math:
+
+\begin{align*}
+ 1+1&=2\\
+ \alpha+\beta&=5
+\end{align*}
+
+Closing text.
+
+\end{document}
+```
+As far as preview-latex is concerned, the Rcode environment is
+identical to a nopreview environment, whose contents are skipped
+entirely. Further, `\\Sexpr` is just a macro that will also be
+ignored. Our inline previews of the LaTeX material should now work as
+expected.
+
+But what about knitr, which does not recognize the contents of Rcode
+as an R code chunk that should be processed?  That's where this
+package comes in.
+
+
