@@ -1,0 +1,41 @@
+---
+title: "Markdown test"
+output: rmarkdown::html_document
+---
+
+
+
+```{r}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  eval=TRUE, echo=TRUE,
+  comment = "#>"
+)
+```
+
+
+
+
+This file should compile with render() without any modifications.
+This is here to test support for legacy files (i.e., nothing is
+broken).
+
+If it doesn't work, try running `pat_md()` to get the knitr pattern.
+
+```{r}
+A <- list(x=1, y=3)
+A
+```
+
+Now some math:
+
+$$
+1+1=2\\
+\alpha+\beta=5
+$$
+
+
+Closing text.
+
+
+

@@ -1,7 +1,8 @@
-#' @name Rcode-pattern
-#' A named list
+#' @name rcode_pattern
+#' @title Definition of the rcode pattern
+#' @details A named list defining the rcode pattern.
 #' @export
-Rcode_pattern_default <- list(
+Rcode_pattern <- list(
   chunk.begin = "^\\s*\\\\begin\\{Rcode\\}\\[(.*)?\\].*$",
   chunk.end = "^\\s*\\\\end\\{Rcode\\}\\s*(%+.*|)$",
   inline.code = "\\\\Sexpr\\{([^}]+)\\}",
@@ -11,15 +12,28 @@ Rcode_pattern_default <- list(
   ref.chunk = "^\\s*\\\\RcodeChunk\\{(.+)\\}.*$"
 )
 
-#' @rdname Rcode-pattern
-#' @param pattern.list A named list with regex patterns for each
-#'   element.
-#' @details The patterns to be included in the list are chunk.begin,
-#'   chunk.end, inline.code, inline.comment, header.begin,
-#'   document.begin, and ref.chunk.
+
+#' @rdname rcode_pattern
+#' @title Functions to set the rcode pattern before knitting or rendering.
+#' @details Sets the pattern to the Rcode default pattern, using the
+#'   same mechanism as knitr. When you run this, you will not be able
+#'   to knit or render other documents without setting the pattern, or
+#'   clearing using knit_patterns$restore().
+#' This will work with Rnw files.  So, to compile an Rnw file with
+#'   Rcode blocks, run pat_rcode() first.  To switch back to Sweave
+#'   syntax (or really, any other syntax), run
+#'   knit_patterns#restore(), and let knitr figure it out. Or, run
+#'   pat_zzz(), where zzz is an extension for the various convenience
+#'   functions provided by knitr.
 #' @export
-Rcode_pattern <- function(pattern.list=Rcode_pattern_default) {
-
-  knit_patterns$set(pattern.list)
-
+pat_rcode <- function() {
+  knit_patterns$restore(Rcode_pattern)
 }
+
+#' @export pat_rlatex pat_Rcode
+#' @rdname rcode_pattern
+pat_rlatex <- pat_rcode
+#' @rdname rcode_pattern
+pat_Rcode <- pat_rcode
+
+

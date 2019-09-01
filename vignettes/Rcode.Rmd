@@ -1,0 +1,235 @@
+---
+title: "Defining knitr R chunks in a LaTeX document using the Rcode environment.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rcode}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+```{r setup}
+library(mbutils)
+```
+
+In a LaTeX document to be compiled using the knitr package, R code
+chunks are delimited by the <<>>= and \@ symbols. This is a rather
+non-standard way of defining text in a LaTeX document, so it can be
+incompatible with other packages.  The mbutils package allows code
+chunks to be defined instead as an environment, so the R code "plays
+nice" with other LaTeX packages.  Defining code chunks this way is
+also useful when using emacs as a text editor, with ESS.
+
+# Motivation
+
+I write nearly everything (papers, code, notes) using emacs
+(specifically, Aquamacs Emacs for MacOS: www.aquamacs.org.). I like
+emacs for the following reasons:
+1.  It's a common editors for coding and LaTeX writing, so I need to
+    remember only a single set of keystrokes.
+2.  R and emacs are very closely integrated using ESS. I can run an R
+    session within an emacs window, copy and paste text back and
+    forth, and even run code chunks directly from another buffer.  ESS
+    also provides font highlighting for R code.
+3. When writing a LaTeX document, I can preview LaTeX math *inline*
+    using the preview-latex emacs package (now included as part of AucTeX).
+    That is, I can see the typset output directly in the file, and not
+    have to keep recompiling a PDF file and viewing it in another window.
+
+Previewing LaTeX output is easy when writing a tex file, with no R
+code.  However, R code chunks cause preview-latex to fail.  The reason
+is that preview-latex does not treat R code differently than LaTeX
+commands. For example, preview-latex would see a \$ in a code chunk
+and think it is a delimiter for a LaTeX mathematical expression.  Just
+one of these occurrences will mess up the previews (and often font
+highlighting) for the entire document.
+
+The solution would be to tell preview-latex to ignore anything between
+the <<>>= and the \@.  But there is no good way to do that.  However,
+it is possible to configure preview-latex to ignore an
+*environment*. Defining new environments is straightforward in LaTeX
+with a few lines in the preamble of the document.  But then,
+knitr would no longer recognize the text in the environment as an R
+code chunk.  This package provides a function that defines an Rcode
+environment as a knitr "pattern," so knitr will treat anything inside
+that environment as a code chunk.
+
+# The Rcode environment
+
+The Rcode environment is the easy part.  Look at the following Rnw
+file that embeds some LaTeX math and R code within a single document.
+
+```
+\documentclass{article}
+\usepackage{amsmath}
+
+%%%%
+\usepackage[textmath,displaymath]{preview}
+\newenvironment{Rcode}[1][]{\begin{nopreview}}{\end{nopreview}}
+\newcommand{\Sexpr}[1]{}
+\PreviewMacro*[{{}}]{\Sexpr}
+\PreviewEnvironment{align*}  %% optional
+%%%%
+
+\begin{document}
+
+Some code:
+\begin{Rcode}[eval=TRUE, echo=TRUE]
+A <- list(x=1, y=2)
+A$x
+\end{Rcode}
+
+Now some math:
+
+\begin{align*}
+ 1+1&=2\\
+ \alpha+\beta&=5
+\end{align*}
+
+Closing text.
+
+\end{document}
+```
+
+The set of 5 lines near the top of this file do the following:
+1.  Load the preview package explicitly, and tell it to preview math
+    expressions that are both inline (textmath) and in display style
+    (displaymath).  There are other options that are described in the
+    preview-latex documentation; those are outside the scope of this
+    note.
+2. Define a new environment, Rcode, that is, from the LaTeX point of
+   view, an alias for the nopreview environment defined by
+   preview-latex.  All R code chunks will be written within the Rcode
+   environment, as a replacement for <<>>= and \@.  The only
+   difference between the Rcode and nopreview environments is that
+   Rcode takes a set of optional arguments:  the knitr chunk options.
+3.  Define a LaTeX macro to delimit inline code.  Since knitr already
+    recognizes \textbackslash Sexpr, that's what we will continue to
+    use.
+4.  The \textbackslash PreviewMacro* macro tells preview-latex to
+    *ignore* the Sexpr macro and all of its arguments and
+    contents. This line is necessary so preview-latex does not
+    mistakenly treat R code as inline math.
+5.  Depending on your application, there may be other definitions and
+    arguments you want to pass to preview-latex.  For example, when
+    I create beamer slides, I tell preview-latex to ignore the frame
+    environment, but to typeset the align* environment.  Otherwise,
+    preview-latex will try to typeset math environments within the
+    frame twice  See the preview-latex documentation for more
+    information.
+
+R code chunks are delimited by the Rcode environment.  Any optional
+knitr chunk options are optional arguments for the environment.
+However, for a reason I have not yet been able to determine, you need
+the [], even if you do not have chunk options.  I'm not sure how to
+fix this yet.
+
+
+# Knitting the document in R
+
+To compile the document, use the same knit commands you use now (I
+usually use knit2pdf).
+
+knitr decides what elements of the document are code chunks by
+scanning for certain text patterns.  The patterns are usually
+determined by the file extension of the input file.  For example, if
+knitr sees that it is processing an Rnw file, it knows to look for
+<<>>= and \@ for code chunks, \textbackslash Sexpr for inline code,
+and so forth. Without further action, knitr will ignore the Rcode
+environment, because it does not know that our Rcode environment
+contains the code.  Even worse, LaTeX may try to typeset the contents
+of the environment, which will likely lead to an error.
+
+The mbutils package provides the information knitr needs to recognize
+the Rcode environment as a code chunk.  Before knitting the document,
+simply call the function
+
+```{r, eval=FALSE, echo=TRUE}
+pat_rcode()
+```
+
+That function will override the default patterns knitr uses for *all* file
+formats.  knitr will scan for \textbackslash begin\{Rcode\}\dots
+\textbackslash end\{Rcode\}, and \textbackslash Sexpr, and will
+*ignore* <<>>= and \@.  Therefore, if you then want to knit a  file
+with "classic Sweave" syntax, you will need to either set that pattern
+with `pat_rnw()`, or run `knit_patterns$restore()` and let knitr
+figure out the right pattern from the file extension.  To go back to
+the new Rcode syntax, just call `pat_rcode()` again.
+
+To summarize:  Within the Rnw file, define R code chunks as
+
+```
+\begin{Rcode}[]
+## Code goes here
+\end{Rcode}
+```
+
+As long as the correct preamble statements are present, preview-latex
+will ignore the Rcode environment when generating inline previews.
+Before compiling, call `pat_rcode()`. Call `knit_patterns$restore()`
+to "clear" any existing patterns. See the knitr documentation for
+dealing with other document types.
+
+
+# Font highlighting in emacs
+
+
+
+# Configuring an ess polymode
+
+If you are using emacs, and especially ess, you want to preserve the
+ability to switch major modes from LaTeX to R and back again depending
+on where you are typing in your document.  ESS has deprecated the
+noweb mode in favor of polymode.  This section explains what you need
+to do for that.
+
+1.  Ensure the following packages are installed and configured in your
+    emacs installation:  ess, polymode, poly-R.
+
+2.  Install poly-latex-R package by coping poly-latex-R.el to your
+    emacs packages directory.  poly-latex-R.el is available with this
+    R package, either from the inst/emacs directory in the source code,
+    or from the \$R\_HOME/library/RlatexUtils/emacs directory in the
+    installed package on your system. Install that file using the M-x
+    package-install-file function from emacs.
+
+3.  Add the following to your emacs preferences file (probably
+    ~/.emacs).  If you are using Aquamacs on MacOS, edit
+    ~/Library/Preferences/Aquamacs Emacs/Preferences.el.
+
+```
+(require 'ess-site)
+(load "ess-autoloads")  ;; need to register Rnw files
+
+(require 'poly-R)
+(require 'poly-markdown)
+(require 'poly-latex-R)
+
+;; recognize Rnw files as poly-latex+R
+(add-to-list 'auto-mode-alist '("\\.[rR]nw$" . poly-latex+R-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR][Ll]atex$" . poly-latex+R-mode))
+;; this means that "classic" noweb Rnw files will not be automatically opened
+;; in poly-noweb+R mode. In that case, set the mode locally.
+;;   manual:  M-x poly-noweb+R-mode
+;;   file variable:    %% -*- mode: poly-noweb+R -*-
+;; Can do the same thing to set the new poly-latex+R mode, if needed.
+
+
+(add-to-list 'LaTeX-verbatim-environments "Rcode")
+(add-to-list 'TeX-file-extensions "RLatex")
+(add-to-list 'TeX-file-extensions "rlatex")
+```
+
+
+

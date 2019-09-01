@@ -1,0 +1,34 @@
+%% -*- mode: poly-noweb+R -*-
+
+
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage[textmath,displaymath,showlabels]{preview}
+\newenvironment{Rcode}[1][]{\begin{nopreview}}{\end{nopreview}}
+\newcommand{\Sexpr}[1]{}
+
+\PreviewEnvironment{align*}
+\PreviewMacro*[{{}}]{\Sexpr}
+
+\begin{document}
+
+Some code:
+\begin{Rcode}[]
+A <- list(x=1, y=3, z="Rlatex")
+A$x
+\end{Rcode}
+
+Inline code:  Ax=\Sexpr{A$x} .
+
+Now some math:
+
+\begin{align*}
+ 1+1&=2\\
+ \alpha+\beta&=5
+\end{align*}
+
+Closing text.
+
+\end{document}
+
