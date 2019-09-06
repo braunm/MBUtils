@@ -1,4 +1,4 @@
-%% -*- mode: poly-noweb+R -*-
+%% -*- mode: poly-latex+R -*-
 
 
 \documentclass{article}
@@ -13,13 +13,21 @@
 
 \begin{document}
 
+
 Some code:
+
 \begin{Rcode}[]
 A <- list(x=1, y=3, z="Rnw")
 A$x  #$
+
 \end{Rcode}
 
+
 This file has the extension of \Sexpr{A[['z']]}.
+
+\begin{Rcode}[]
+
+\end{Rcode}
 
 Inline code:  Ax=\Sexpr{A$x} .  %$
 
