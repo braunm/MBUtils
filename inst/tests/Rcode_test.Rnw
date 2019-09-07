@@ -2,6 +2,7 @@
 
 
 \documentclass{article}
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 
 \usepackage[textmath,displaymath,showlabels]{preview}
@@ -16,18 +17,18 @@
 
 Some code:
 
-\begin{Rcode}[]
+\begin{Rcode}[echo=TRUE, background='#BAAAAA']
 A <- list(x=1, y=3, z="Rnw")
 A$x  #$
-
 \end{Rcode}
 
 
 This file has the extension of \Sexpr{A[['z']]}.
 
-\begin{Rcode}[]
-
-\end{Rcode}
+\begin{rcode}
+r <- 9 + 888
+r
+\end{rcode}
 
 Inline code:  Ax=\Sexpr{A$x} .  %$
 
@@ -37,6 +38,7 @@ Now some math:
  1+1&=2\\
  \alpha+\beta&=5
 \end{align*}
+
 
 Closing text.
 

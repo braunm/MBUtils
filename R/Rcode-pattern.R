@@ -3,8 +3,8 @@
 #' @details A named list defining the rcode pattern.
 #' @export
 Rcode_pattern <- list(
-  chunk.begin = "^\\s*\\\\begin\\{Rcode\\}\\[(.*)?\\].*$",
-  chunk.end = "^\\s*\\\\end\\{Rcode\\}\\s*(%+.*|)$",
+  chunk.begin = "^\\s*\\\\begin\\{[Rr]code\\}(?:\\[(.*)?\\])?\\s*(%+.*|)$",
+  chunk.end = "^\\s*\\\\end\\{[Rr]code\\}\\s*(%+.*|)$",
   inline.code = "\\\\Sexpr\\{([^}]+)\\}",
   inline.comment = "^\\s*%.*",
   header.begin = "(^|\n)\\s*\\\\documentclass[^}]+\\}",
