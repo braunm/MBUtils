@@ -1,4 +1,4 @@
-%% -*- mode: poly-latex+R -*-
+
 
 
 \documentclass{article}
@@ -7,6 +7,7 @@
 
 \usepackage[textmath,displaymath,showlabels]{preview}
 \newenvironment{Rcode}[1][]{\begin{nopreview}}{\end{nopreview}}
+\newenvironment{rcode}[1][]{\begin{nopreview}}{\end{nopreview}}
 \newcommand{\Sexpr}[1]{}
 
 \PreviewEnvironment{align*}
@@ -15,7 +16,9 @@
 \begin{document}
 
 
+
 Some code:
+
 
 \begin{Rcode}[echo=TRUE, background='#BAAAAA']
 A <- list(x=1, y=3, z="Rnw")
@@ -23,14 +26,21 @@ A$x  #$
 \end{Rcode}
 
 
-This file has the extension of \Sexpr{A[['z']]}.
-
 \begin{rcode}
-r <- 9 + 888
-r
+
 \end{rcode}
 
-Inline code:  Ax=\Sexpr{A$x} .  %$
+
+This file has the extension of \Sexpr{A[['z']]}.
+
+\begin{rcode} 
+r <- 9 + 888
+r
+  
+
+\end{rcode}
+
+Inline code:  Ax=\Sexpr{A$x} . 
 
 Now some math:
 

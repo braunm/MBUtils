@@ -1,5 +1,4 @@
-
-
+library(stringr)
 
 
 context("Chunk matching")
@@ -13,7 +12,7 @@ test_that("regex matches chunk head patterns", {
   s3 <- "\\begin{Rcode}[]"
   s4 <- "  \\begin{rcode}[]   "
   s5 <- "\\begin{Rcode}[] %% comment"
- 
+
   expect_match(s1, cb)
   expect_match(s2, cb)
   expect_match(s3, cb)
@@ -37,11 +36,11 @@ test_that("regex matches chunk tail patterns", {
   s3 <- "\\end{Rcode}  %%%%% comment"
   s4 <- "  \\end{rcode}%comment  "
   s5 <- "\t\\end{Rcode} %xxx"
- 
+
   expect_match(s1, ce)
   expect_match(s2, ce)
   expect_match(s3, ce)
   expect_match(s4, ce)
   expect_match(s5, ce)
-  
+
   })
