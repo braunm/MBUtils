@@ -7,7 +7,9 @@
 \alias{pat_rmd}
 \alias{pat_Rmd}
 \title{Definition of the Rmd pattern}
-\format{An object of class \code{list} of length 4.}
+\format{
+An object of class \code{list} of length 4.
+}
 \usage{
 Rmd_pattern
 

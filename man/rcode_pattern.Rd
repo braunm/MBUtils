@@ -8,7 +8,9 @@
 \alias{pat_rlatex}
 \alias{pat_Rcode}
 \title{Definition of the rcode pattern}
-\format{An object of class \code{list} of length 7.}
+\format{
+An object of class \code{list} of length 7.
+}
 \usage{
 Rcode_pattern
 
