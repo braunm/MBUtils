@@ -8,5 +8,9 @@
 #'
 #' @useDynLib mbutils, .registration=TRUE
 #' @importFrom Rcpp evalCpp
+#' @importFrom tidyr pivot_wider pivot_longer
+#' @importFrom knitr knit_patterns
+#' @importFrom rlang enquo as_label
+#' @importFrom stringr str_detect
 #' @import methods
 NULL
